@@ -25,8 +25,6 @@ class DeleteRequest extends FormRequest
      */
     public function rules()
     {
-        //dd(substr($this->route('course'), -1));
-        // $this->course = substr($this->route('course'), -1);
         return [
             //
             'course' => [
@@ -38,6 +36,6 @@ class DeleteRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->merge(['course' => substr($this->route('course'), -1)]);
+        $this->merge(['course' => substr($this->route('course'), 4)]);
     }
 }

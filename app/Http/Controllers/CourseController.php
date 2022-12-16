@@ -29,7 +29,7 @@ class CourseController extends Controller
         $viewData = [];
         $viewData['title'] = "Courses";
         $q = "%$request->q%";
-        $viewData['courses'] = Course::where('name', 'like', $q)->paginate(5)->appends(['q' => $request->q]);
+        $viewData['courses'] = Course::where('name', 'like', $q)->paginate(4)->appends(['q' => $request->q]);
         $viewData['courses']->append(['q' => $q]);
         $viewData['trashes'] = Course::onlyTrashed()->paginate($perPage = 2, $columns = ['*'], $pageName = 'trashes')->appends(['q' => $request->q]);
         return view('course.index')->with('viewData', $viewData);
@@ -107,8 +107,8 @@ class CourseController extends Controller
      */
     public function destroy(DeleteRequest $request, $id)
     {
-        $request->validated();
-        $course = Course::findOrFail(Course::decode($id));
+        $course = $request->validated()['course'];
+        $course = Course::findOrFail($course);
         $course->delete();
         // Course::destroy($id);
 

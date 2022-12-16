@@ -25,8 +25,10 @@ Route::prefix('course')->controller(CourseController::class)->name('course.')->g
     Route::put('/edit/{course}', 'update')->name('update');
 });
 
+Route::get('/', function () {
+    return view('layouts.master');
+});
 
-
-Route::get('/', [StudentController::class, 'index'])->name('home.app');
-Route::get('/create', [StudentController::class, 'create'])->name('students.create');
-Route::post('/create', [StudentController::class, 'store'])->name('students.store');
+// Route::get('/', [StudentController::class, 'index'])->name('home.app');
+// Route::get('/create', [StudentController::class, 'create'])->name('students.create');
+// Route::post('/create', [StudentController::class, 'store'])->name('students.store');
