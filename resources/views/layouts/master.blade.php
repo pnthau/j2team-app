@@ -26,12 +26,13 @@
     <!-- Custom css -->
     <link rel="stylesheet" href="{{ asset('css/master.css') }}">
 
-
-
     <script type="text/javascript" charset="UTF-8" src="https://maps.googleapis.com/maps-api-v3/api/js/51/3/common.js">
     </script>
     <script type="text/javascript" charset="UTF-8" src="https://maps.googleapis.com/maps-api-v3/api/js/51/3/util.js">
     </script>
+
+    @section('styles')
+    @show
 </head>
 
 <body>
@@ -487,6 +488,9 @@
         </div>
     </div>
 
+    {{-- @vite('resources/js/jquery.js') --}}
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js">
+    </script>
     <script src="{{ asset('js/jquery.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/perfect-scrollbar.jquery.min.js') }}" type="text/javascript"></script>
@@ -538,8 +542,8 @@
     <!-- Light Bootstrap Dashboard Core javascript and methods -->
     <script src="{{ asset('js/light-bootstrap-dashboard.js?v=1.4.1') }}"></script>
 
-
-
+    @section('scripts')
+    @show
 </body><!--   Core JS Files  -->
 
 </html>

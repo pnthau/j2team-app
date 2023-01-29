@@ -14,14 +14,15 @@
                     {{-- Previous Page Link --}}
                     @if ($paginator->onFirstPage())
                     <li class="paginate_button first disabled" id="datatables_first">
-                        <span class="page-link">First</span>
+                        <a href="#">First</a>
                     </li>
                     <li class="paginate_button previous disabled" id="datatables_previous">
-                        <span class="page-link">Previous</span>
+                        <a href="#">Previous</a>
                     </li>
                     @else
-                    <li class="paginate_button first" id="datatables_first"><a href="#" aria-controls="datatables"
-                            data-dt-idx="0" tabindex="0">First</a>
+                    <li class="paginate_button first" id="datatables_first">
+                        <a href="{{ url()->current() }}" aria-controls="datatables" data-dt-idx="0"
+                            tabindex="0">First</a>
                     </li>
                     <li class="paginate_button previous" id="datatables_previous"><a
                             href="{{ $paginator->previousPageUrl() }}" aria-controls="datatables" data-dt-idx="1"
@@ -57,15 +58,16 @@
                     <li class="paginate_button next" id="datatables_next"><a href=" {{ $paginator->nextPageUrl() }}"
                             aria-controls="datatables" data-dt-idx="6" tabindex="0">Next</a>
                     </li>
-                    <li class="paginate_button last" id="datatables_last"><a href=" {{ $paginator->nextPageUrl() }}"
-                            aria-controls="datatables" data-dt-idx="7" tabindex="0">Last</a>
+                    <li class="paginate_button last" id="datatables_last"><a
+                            href="{{ url()->current().'?page='.$paginator->lastPage() }}" aria-controls="datatables"
+                            data-dt-idx="7" tabindex="0">Last</a>
                     </li>
                     @else
-                    <li class="paginate_button next disabled" id="datatables_next">
-                        <span class="page-link">Next</span>
+                    <li class="paginate_button disabled" id="datatables_next">
+                        <a href="#">Next</a>
                     </li>
                     <li class="paginate_button last disabled" id="datatables_last">
-                        <span class="page-link">Last</span>
+                        <a href="#">Last</a>
                     </li>
                     @endif
                 </ul>

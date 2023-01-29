@@ -6,17 +6,24 @@ use App\Http\Requests\Courses\DeleteRequest;
 use App\Http\Requests\Courses\StoreRequest;
 use App\Http\Requests\Courses\UpdateRequest;
 use App\Models\Course;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Yajra\Datatables\Datatables;
 
 class CourseController extends Controller
 {
-    private static $courses = [
-        ['name' => 'literature'],
-        ['name' => 'math'],
-        ['name' => 'chemistry'],
-        ['name' => 'english'],
-    ];
+    private $model = NULL;
+    private $title = "";
+    public function __construct()
+    {
+        $currentRoute =  Route::currentRouteName();
+        $explode = explode('.', $currentRoute);
+        $explode = array_map('ucfirst', $explode);
+        $this->title = implode(' / ', $explode);
+        View::share('title', $this->title);
+        $this->model = new Course;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -25,13 +32,12 @@ class CourseController extends Controller
 
     public function index(Request $request)
     {
-        // Course::insert(static::$courses);
+        // $this->model::insert(static::$courses);
         $viewData = [];
-        $viewData['title'] = "Courses";
         $q = "%$request->q%";
-        $viewData['courses'] = Course::where('name', 'like', $q)->paginate(4)->appends(['q' => $request->q]);
+        $viewData['courses'] = $this->model::where('name', 'like', $q)->paginate(50)->appends(['q' => $request->q]);
         $viewData['courses']->append(['q' => $q]);
-        $viewData['trashes'] = Course::onlyTrashed()->paginate($perPage = 2, $columns = ['*'], $pageName = 'trashes')->appends(['q' => $request->q]);
+        $viewData['trashes'] = $this->model::onlyTrashed()->paginate($perPage = 2, $columns = ['*'], $pageName = 'trashes')->appends(['q' => $request->q]);
         return view('course.index')->with('viewData', $viewData);
     }
 
@@ -42,7 +48,8 @@ class CourseController extends Controller
      */
     public function create()
     {
-        return view('course.create');
+        $viewData['title'] = "Add Course";
+        return view('course.create')->with('viewData', $viewData);
     }
 
     /**
@@ -55,7 +62,7 @@ class CourseController extends Controller
     public function store(StoreRequest $request)
     {
         $createData = $request->validated();
-        Course::create($createData);
+        $this->model::create($createData);
         return redirect()->route('course.index');
     }
 
@@ -80,7 +87,7 @@ class CourseController extends Controller
     {
         //
         $viewData = [];
-        $viewData['course'] = Course::findOrFail(Course::decode($id));
+        $viewData['course'] = $this->model::findOrFail($this->model::decode($id));
         return view('course.edit')->with('viewData', $viewData);
     }
 
@@ -94,7 +101,7 @@ class CourseController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         $createData = $request->validated();
-        $course = Course::findOrFail(Course::decode($id));
+        $course = $this->model::findOrFail($this->model::decode($id));
         $course->update($createData);
         return redirect()->route('course.index');
     }
@@ -108,10 +115,42 @@ class CourseController extends Controller
     public function destroy(DeleteRequest $request, $id)
     {
         $course = $request->validated()['course'];
-        $course = Course::findOrFail($course);
+        $course = $this->model::findOrFail($course);
         $course->delete();
-        // Course::destroy($id);
 
-        return redirect()->route('course.index');
+        // $this->model::destroy($id);
+        $dataAPI = [];
+        $dataAPI['message'] = 'destroy is successful';
+        $dataAPI['status'] = true;
+
+        return response($dataAPI);
+    }
+
+    public function api()
+    {
+        return Datatables::of($this->model::query())
+            ->editColumn('created_at', function ($object) {
+                return $object->created_format;
+            })
+            ->addColumn('edit', function ($object) {
+                $link = route('course.edit', ['course' => $object]);
+                return $link;
+            })
+            ->addColumn('delete', function ($object) {
+                $link = route('course.destroy', ['course' => $object]);
+                return $link;
+            })
+            ->make(true);
+    }
+
+    public function apiName(Request $request)
+    {
+        $search =  "%{$request->q}%";
+        return $this->model->where('name', 'LIKE', $search)->get(
+            [
+                'id',
+                'name',
+            ]
+        );
     }
 }

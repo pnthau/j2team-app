@@ -1,60 +1,96 @@
-@extends('layouts.admin')
+@extends('layouts.master')
 @section('content')
-<div class="container">
     <div class="row">
         <div class="col-4"></div>
         <div class="col-4 mh-100">
-            <form class="row g-3 border " method="post" action=" {{ route('students.store') }}">
-                @csrf
-                <div class="col-md-6">
-                    <label for="firstname" class="form-label">FirstName</label>
-                    <input type="text" class="form-control" id="firstname" name="firstname">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="col-md-6">
-                    <label for="lastname" class="form-label">LastName</label>
-                    <input type="text" class="form-control" id="lastname" name="lastname">
+            @endif
+            <div class="card">
+                <div class="header">
+                    <legend>Add Student</legend>
                 </div>
-                <div class="col-6">
-                    <label for="inputAddress" class="form-label">Year</label>
-                    <input type="date" class="form-control" id="inputAddress" name="year">
+                <div class="content">
+                    <form method="post" action="{{ route('students.store') }}" class="form-horizontal">
+                        @csrf
+                        <fieldset>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="firstname">First Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="firstname" id="firstname">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="lastname">Last Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="lastname" id="lastname">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="year">Year</label>
+                                <div class="col-sm-10">
+                                    <input type="date" class="form-control" name="year" id="year">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="courses">Courses Name </label>
+                                <div class="col-sm-10">
+                                    <select name="course_id" class="selectpicker" data-title="Select Courses"
+                                        data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+                                        @foreach ($viewData['courses'] as $course)
+                                            <option value="{{ \App\Models\Course::decode($course->id) }}">
+                                                {{ __($course->name) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="status">Status</label>
+                                <div class="col-sm-10">
+                                    <select name="status" class="selectpicker" data-title="Select status"
+                                        data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+                                        @foreach ($studentsStatus as $option => $value)
+                                            <option value="{{ $value }}">{{ $option }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="gender">Gender</label>
+                                <div class="col-sm-10">
+                                    <select name="gender" class="selectpicker" data-title="Select Gender"
+                                        data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10">
+                                <button type="submit" class="btn btn-fill btn-info">Save</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-6">
-                    <label for="gender" class="form-label">Gender</label>
-                    <select id="gender" class="form-select" name="gender">
-                        <option selected>Choose...</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="inputCity" class="form-label">City</label>
-                    <input type="text" class="form-control" id="inputCity">
-                </div>
-                <div class="col-md-4">
-                    <label for="inputState" class="form-label">State</label>
-                    <select id="inputState" class="form-select">
-                        <option selected>Choose...</option>
-                        <option>...</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="inputZip" class="form-label">Zip</label>
-                    <input type="text" class="form-control" id="inputZip">
-                </div>
-                <div class="col-12">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="gridCheck">
-                        <label class="form-check-label" for="gridCheck">
-                            Check me out
-                        </label>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Sign in</button>
-                </div>
-            </form>
+            </div>
         </div>
         <div class="col-4"></div>
-    </div>
-</div>
-@endsection
+    @endsection

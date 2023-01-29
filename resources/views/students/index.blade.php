@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('title', $title)
+@section('title', $viewData['title'])
 @section('content')
     <!--<buttonn type="button" class="btn btn-primary my-3 px-10"> </button>-->
     <div class="row">
@@ -25,13 +25,9 @@
                         <div id="datatables_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <a href="{{ route('course.create') }}"
-                                        class="btn btn-simple btn-wd text-left text-primary pl-1"><u>Add course</u></a>
+                                    <a href="{{ route('students.create') }}"
+                                        class="btn btn-simple btn-wd text-left text-primary pl-1"><u>Add Student</u></a>
                                 </div>
-                            </div>
-                            <div>
-                                <select class="js-example-data-ajax dropdown-menu" id="select-name" name="state">
-                                </select>
                             </div>
                             <div class="row">
                                 <div class="col-sm-12">
@@ -46,12 +42,20 @@
                                                     aria-label="Name: activate to sort column ascending">#</th>
                                                 <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
                                                     colspan="1" style="width: 277px;"
-                                                    aria-label="Position: activate to sort column ascending">Name
+                                                    aria-label="Position: activate to sort column ascending">Full Name
+                                                </th>
+                                                <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
+                                                    colspan="1" style="width: 277px;"
+                                                    aria-label="Position: activate to sort column ascending">Age
+                                                </th>
+                                                <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
+                                                    colspan="1" style="width: 277px;"
+                                                    aria-label="Position: activate to sort column ascending">Gender
                                                 </th>
                                                 <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
                                                     colspan="1" style="width: 122px;"
-                                                    aria-label="Start date: activate to sort column ascending">Start date
-                                                </th>
+                                                    aria-label="Start date: activate to sort column ascending">Start
+                                                    date</th>
                                                 <th class="disabled-sorting text-right sorting" tabindex="0"
                                                     aria-controls="datatables" rowspan="1" colspan="1"
                                                     style="width: 138px;"
@@ -64,15 +68,18 @@
                                         </thead>
                                         <tfoot>
                                             <th rowspan="1" colspan="1">#</th>
-                                            <th rowspan="1" colspan="1">Name</th>
+                                            <th rowspan="1" colspan="1">Full Name</th>
+                                            <th rowspan="1" colspan="1">Age</th>
+                                            <th rowspan="1" colspan="1">Gender</th>
                                             <th rowspan="1" colspan="1">Start date</th>
+                                            <th class="text-right" rowspan="1" colspan="1">Actions</th>
                                             <th class="text-right" rowspan="1" colspan="1">Actions</th>
                                             </tr>
                                         </tfoot>
                                     </table>
                                 </div>
                             </div>
-                            {{ $viewData['courses']->render('components.pagination') }}
+                            {{-- {{ $viewData['students']->render('components.pagination') }} --}}
                         </div>
                     </div>
                 </div><!-- end content-->
@@ -95,72 +102,6 @@
 
     <script type="text/javascript">
         $(function() {
-            $(".js-example-data-ajax").select2({
-                ajax: {
-                    url: "{{ route('course.apiName') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term, // search term
-                        };
-                    },
-                    processResults: function(data, params) {
-                        // parse the results into the format expected by Select2
-                        // since we are using custom formatting functions we do not need to
-                        // alter the remote JSON data, except to indicate that infinite
-                        // scrolling can be used
-                        return {
-                            results: $.map(data, function(item) {
-                                return {
-                                    text: item.name,
-                                    id: item.id
-                                }
-                            })
-                        };
-                    },
-                    cache: true
-                },
-                placeholder: 'Search for a name',
-                minimumInputLength: 1,
-            });
-
-            function formatRepo(repo) {
-                if (repo.loading) {
-                    return repo.text;
-                }
-
-                var $container = $(
-                    "<div class='select2-result-repository clearfix'>" +
-                    "<div class='select2-result-repository__avatar'><img src='" + repo.owner.avatar_url +
-                    "' /></div>" +
-                    "<div class='select2-result-repository__meta'>" +
-                    "<div class='select2-result-repository__title'></div>" +
-                    "<div class='select2-result-repository__description'></div>" +
-                    "<div class='select2-result-repository__statistics'>" +
-                    "<div class='select2-result-repository__forks'><i class='fa fa-flash'></i> </div>" +
-                    "<div class='select2-result-repository__stargazers'><i class='fa fa-star'></i> </div>" +
-                    "<div class='select2-result-repository__watchers'><i class='fa fa-eye'></i> </div>" +
-                    "</div>" +
-                    "</div>" +
-                    "</div>"
-                );
-
-                $container.find(".select2-result-repository__title").text(repo.full_name);
-                $container.find(".select2-result-repository__description").text(repo.description);
-                $container.find(".select2-result-repository__forks").append(repo.forks_count + " Forks");
-                $container.find(".select2-result-repository__stargazers").append(repo.stargazers_count + " Stars");
-                $container.find(".select2-result-repository__watchers").append(repo.watchers_count + " Watchers");
-
-                return $container;
-            }
-
-            function formatRepoSelection(repo) {
-                return repo.full_name || repo.text;
-            }
-
-
-
             //datatable
             $(document).on('click', '.btn-delete', function(event) {
                 event.preventDefault()
@@ -207,7 +148,7 @@
                 ],
                 processing: true,
                 serverSide: true,
-                ajax: '{!! route('course.api') !!}',
+                ajax: '{!! route('students.api') !!}',
                 columnDefs: [{
                     className: "not-export",
                     "targets": [3]
@@ -217,12 +158,20 @@
                         name: 'id'
                     },
                     {
-                        data: 'name',
-                        name: 'name'
+                        data: 'full_name',
+                        name: 'full_name'
+                    },
+                    {
+                        data: 'year',
+                        name: 'year'
+                    },
+                    {
+                        data: 'gender',
+                        name: 'gender',
                     },
                     {
                         data: 'created_at',
-                        name: 'created_at'
+                        name: 'created_at',
                     },
                     {
                         data: 'edit',
@@ -251,12 +200,6 @@
                     }
                 ]
             });
-
-            $('#select-name').change(function() {
-                let decode = this.value.substr(4);
-                console.log(decode);
-                table.column(0).search(decode).draw();
-            })
             //end datatable.
         });
     </script>

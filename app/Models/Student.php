@@ -6,13 +6,21 @@ use DateTime;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
 
-    protected $fillable = ['firstname', 'lastname', 'year', 'gender'];
+    protected $fillable = [
+        'firstname',
+        'lastname',
+        'year',
+        'gender',
+        'status',
+        'course_id'
+    ];
     /**
      * Get the user's first name.
      *
@@ -28,8 +36,15 @@ class Student extends Model
     protected function id(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => "100$value",
+            get: fn ($value) => "1000$value",
             set: fn ($value) => $value,
+        );
+    }
+    protected function courseId(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => "1000$value",
+            set: fn ($value) => $value
         );
     }
     protected function age(): Attribute
@@ -49,5 +64,15 @@ class Student extends Model
             get: fn ($value) => $value ? 'Male' : 'Female',
             set: fn ($value) => $value === 'Male' ? 1 : 0,
         );
+    }
+    protected function createdFormat(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->created_at->format('Y-m-d'),
+        );
+    }
+    public static function decode($id)
+    {
+        return substr($id, 4);
     }
 }

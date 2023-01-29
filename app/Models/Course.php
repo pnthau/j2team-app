@@ -12,6 +12,7 @@ class Course extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['name'];
+
     protected function createdFormat(): Attribute
     {
         return Attribute::make(
@@ -26,6 +27,6 @@ class Course extends Model
     }
     public static function decode($id)
     {
-        return substr($id, -1);
+        return substr($id, 4);
     }
 }
