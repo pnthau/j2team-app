@@ -49,24 +49,33 @@
                                                     aria-label="Position: activate to sort column ascending">Name
                                                 </th>
                                                 <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
+                                                    colspan="1" style="width: 277px;"
+                                                    aria-label="Position: activate to sort column ascending">Total Students
+                                                </th>
+                                                <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
                                                     colspan="1" style="width: 122px;"
                                                     aria-label="Start date: activate to sort column ascending">Start date
                                                 </th>
-                                                <th class="disabled-sorting text-right sorting" tabindex="0"
-                                                    aria-controls="datatables" rowspan="1" colspan="1"
-                                                    style="width: 138px;"
-                                                    aria-label="Actions: activate to sort column ascending">Actions</th>
-                                                <th class="disabled-sorting text-right sorting" tabindex="0"
-                                                    aria-controls="datatables" rowspan="1" colspan="1"
-                                                    style="width: 138px;"
-                                                    aria-label="Actions: activate to sort column ascending">Actions</th>
+                                                @super()
+                                                    <th class="disabled-sorting text-right sorting" tabindex="0"
+                                                        aria-controls="datatables" rowspan="1" colspan="1"
+                                                        style="width: 138px;"
+                                                        aria-label="Actions: activate to sort column ascending">Actions</th>
+                                                    <th class="disabled-sorting text-right sorting" tabindex="0"
+                                                        aria-controls="datatables" rowspan="1" colspan="1"
+                                                        style="width: 138px;"
+                                                        aria-label="Actions: activate to sort column ascending">Actions</th>
+                                                @endsuper
                                             </tr>
                                         </thead>
                                         <tfoot>
                                             <th rowspan="1" colspan="1">#</th>
                                             <th rowspan="1" colspan="1">Name</th>
+                                            <th rowspan="1" colspan="1">Total Students</th>
                                             <th rowspan="1" colspan="1">Start date</th>
-                                            <th class="text-right" rowspan="1" colspan="1">Actions</th>
+                                            @super()
+                                                <th class="text-right" rowspan="1" colspan="1">Actions</th>
+                                            @endsuper
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -159,8 +168,6 @@
                 return repo.full_name || repo.text;
             }
 
-
-
             //datatable
             $(document).on('click', '.btn-delete', function(event) {
                 event.preventDefault()
@@ -221,10 +228,14 @@
                         name: 'name'
                     },
                     {
+                        data: 'students_count',
+                        name: 'students_count',
+                    },
+                    {
                         data: 'created_at',
                         name: 'created_at'
                     },
-                    {
+                    @super() {
                         data: 'edit',
                         targets: 3,
                         orderable: false,
@@ -249,6 +260,7 @@
                             </form>`;
                         },
                     }
+                    @endsuper
                 ]
             });
 

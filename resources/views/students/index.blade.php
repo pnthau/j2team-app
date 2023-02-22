@@ -29,6 +29,20 @@
                                         class="btn btn-simple btn-wd text-left text-primary pl-1"><u>Add Student</u></a>
                                 </div>
                             </div>
+                            <div>
+                                <select class="js-example-data-ajax dropdown-menu" id="select-name" name="state">
+                                </select>
+                            </div>
+                            <div>
+                                <select name="status" class="selectpicker" id="select-course-name"
+                                    data-title="Select status" data-style="btn-default btn-block"
+                                    data-menu-style="dropdown-blue">
+                                    <option value="0">Tất cả</option>
+                                    @foreach ($studentsStatus as $option => $value)
+                                        <option value="{{ $value }}">{{ $option }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="row">
                                 <div class="col-sm-12">
                                     <table id="datatables"
@@ -40,6 +54,10 @@
                                                 <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
                                                     colspan="1" style="width: 189px;"
                                                     aria-label="Name: activate to sort column ascending">#</th>
+                                                <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
+                                                    colspan="1" style="width: 277px;"
+                                                    aria-label="Position: activate to sort column ascending">Avatar
+                                                </th>
                                                 <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
                                                     colspan="1" style="width: 277px;"
                                                     aria-label="Position: activate to sort column ascending">Full Name
@@ -54,26 +72,35 @@
                                                 </th>
                                                 <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
                                                     colspan="1" style="width: 122px;"
-                                                    aria-label="Start date: activate to sort column ascending">Start
-                                                    date</th>
-                                                <th class="disabled-sorting text-right sorting" tabindex="0"
-                                                    aria-controls="datatables" rowspan="1" colspan="1"
-                                                    style="width: 138px;"
-                                                    aria-label="Actions: activate to sort column ascending">Actions</th>
-                                                <th class="disabled-sorting text-right sorting" tabindex="0"
-                                                    aria-controls="datatables" rowspan="1" colspan="1"
-                                                    style="width: 138px;"
-                                                    aria-label="Actions: activate to sort column ascending">Actions</th>
+                                                    aria-label="Start date: activate to sort column ascending">Status</th>
+                                                <th class="sorting" tabindex="0" aria-controls="datatables" rowspan="1"
+                                                    colspan="1" style="width: 122px;"
+                                                    aria-label="Start date: activate to sort column ascending">Course Name
+                                                </th>
+                                                @super()
+                                                    <th class="disabled-sorting text-right sorting" tabindex="0"
+                                                        aria-controls="datatables" rowspan="1" colspan="1"
+                                                        style="width: 138px;"
+                                                        aria-label="Actions: activate to sort column ascending">Actions</th>
+                                                    <th class="disabled-sorting text-right sorting" tabindex="0"
+                                                        aria-controls="datatables" rowspan="1" colspan="1"
+                                                        style="width: 138px;"
+                                                        aria-label="Actions: activate to sort column ascending">Actions</th>
+                                                @endsuper
                                             </tr>
                                         </thead>
                                         <tfoot>
                                             <th rowspan="1" colspan="1">#</th>
+                                            <th rowspan="1" colspan="1">Avatar</th>
                                             <th rowspan="1" colspan="1">Full Name</th>
                                             <th rowspan="1" colspan="1">Age</th>
                                             <th rowspan="1" colspan="1">Gender</th>
-                                            <th rowspan="1" colspan="1">Start date</th>
-                                            <th class="text-right" rowspan="1" colspan="1">Actions</th>
-                                            <th class="text-right" rowspan="1" colspan="1">Actions</th>
+                                            <th rowspan="1" colspan="1">Status</th>
+                                            <th rowspan="1" colspan="1">Course Name</th>
+                                            @super()
+                                                <th class="text-right" rowspan="1" colspan="1">Actions</th>
+                                                <th class="text-right" rowspan="1" colspan="1">Actions</th>
+                                            @endsuper
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -102,6 +129,40 @@
 
     <script type="text/javascript">
         $(function() {
+            //select 2
+            $(".js-example-data-ajax").select2({
+                ajax: {
+                    url: "{{ route('course.apiName') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term, // search term
+                        };
+                    },
+                    processResults: function(data, params) {
+                        // parse the results into the format expected by Select2
+                        // since we are using custom formatting functions we do not need to
+                        // alter the remote JSON data, except to indicate that infinite
+                        // scrolling can be used
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    text: item.name,
+                                    id: item.id
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                placeholder: 'Search for a name',
+                minimumInputLength: 1,
+                allowClear: true,
+
+            });
+
+
             //datatable
             $(document).on('click', '.btn-delete', function(event) {
                 event.preventDefault()
@@ -158,6 +219,14 @@
                         name: 'id'
                     },
                     {
+                        data: 'avatar',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row, meta) {
+                            return `<img src="${data}" alt="avart">`;
+                        },
+                    },
+                    {
                         data: 'full_name',
                         name: 'full_name'
                     },
@@ -170,10 +239,14 @@
                         name: 'gender',
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at',
+                        data: 'status',
+                        name: 'status',
                     },
                     {
+                        data: 'course_name',
+                        name: 'course_name',
+                    },
+                    @super() {
                         data: 'edit',
                         targets: 3,
                         orderable: false,
@@ -198,8 +271,21 @@
                             </form>`;
                         },
                     }
+                    @endsuper
                 ]
             });
+
+
+            //change select status
+            $('#select-course-name').change(function() {
+                let value = $(this).val();
+                table.column(5).search(value).draw();
+            })
+            //change select course name.
+            $('#select-name').change(function() {
+                let decode = $(this).val() != null ? $(this).val().substr(4) : '';
+                table.column(6).search(decode).draw();
+            })
             //end datatable.
         });
     </script>

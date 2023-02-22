@@ -17,7 +17,8 @@
                     <legend>Add Student</legend>
                 </div>
                 <div class="content">
-                    <form method="post" action="{{ route('students.store') }}" class="form-horizontal">
+                    <form method="post" action="{{ route('students.store') }}" class="form-horizontal"
+                        enctype="multipart/form-data">
                         @csrf
                         <fieldset>
                             <div class="form-group">
@@ -79,6 +80,14 @@
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
                                     </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="avatar">Avatar</label>
+                                <div class="col-sm-10">
+                                    <input class="form-control" type="file" name="avatar">
                                 </div>
                             </div>
                         </fieldset>

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\StudentStatusEnum;
 use App\Models\Course;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,7 +24,8 @@ class StudentFactory extends Factory
             'year' =>    $this->faker->dateTimeBetween('-40 years', '-18 years'),
             'gender' => $this->faker->boolean(),
             'course_id' => Course::decode(Course::inRandomOrder()->value('id')),
-            'status' => $this->faker->numberBetween(0, 3),
+            'status' => $this->faker->randomElement(StudentStatusEnum::asArray()),
+            'avatar' => $this->faker->imageUrl(60, 60, 'avatar'),
         ];
     }
 }

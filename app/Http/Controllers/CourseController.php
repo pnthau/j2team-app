@@ -61,8 +61,8 @@ class CourseController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $createData = $request->validated();
-        $this->model::create($createData);
+        $validator = $request->validated();
+        $this->model::create($validator);
         return redirect()->route('course.index');
     }
 
@@ -100,9 +100,9 @@ class CourseController extends Controller
      */
     public function update(UpdateRequest $request, $id)
     {
-        $createData = $request->validated();
+        $validator = $request->validated();
         $course = $this->model::findOrFail($this->model::decode($id));
-        $course->update($createData);
+        $course->update($validator);
         return redirect()->route('course.index');
     }
 
@@ -128,9 +128,17 @@ class CourseController extends Controller
 
     public function api()
     {
-        return Datatables::of($this->model::query())
+        $query = $this->model->withCount('students');
+
+        return Datatables::of($query)
             ->editColumn('created_at', function ($object) {
                 return $object->created_format;
+            })
+            ->addColumn('students_count', function ($object) {
+                if ($object->students_count) {
+                    return $object->students_count;
+                }
+                return "khong co";
             })
             ->addColumn('edit', function ($object) {
                 $link = route('course.edit', ['course' => $object]);

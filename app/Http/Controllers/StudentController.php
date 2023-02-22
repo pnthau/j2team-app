@@ -17,18 +17,24 @@ class StudentController extends Controller
 {
     private $model = NULL;
     private $title = "";
-
+    private $dirImages = "";
     public function __construct()
     {
         $this->model = new Student;
 
+        $this->dirImages = "storage/imgs/";
+
         $currentRoute =  Route::currentRouteName();
+
         $explode = explode('.', $currentRoute);
         $explode = array_map('ucfirst', $explode);
         $this->title = implode(' / ', $explode);
 
         View::share('title', $this->title);
         View::share('studentsStatus', StudentStatusEnum::getStudentStatus());
+        View::share('getStatusByKey', function ($key) {
+            return StudentStatusEnum::getValueByKey($key);
+        });
     }
     /**
      * Display a listing of the resource.
@@ -37,6 +43,8 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
+        $this->model->course;
+        // dd($this->model::first()->course);
         // $this->model::insert(static::$courses);
         $viewData = [];
         $viewData['title'] = "Students";
@@ -73,9 +81,16 @@ class StudentController extends Controller
      */
     public function store(StoreRequest $request)
     {
-
+        // dd($request->file('avatar'));
+        // dd($request->file('avatar')->getRealPath());
         $createData = $request->validated();
-        $this->model::create($createData);
+        $newStudent = $this->model::create($createData);
+        if ($request->hasFile('avatar')) {
+            $original_image = $request->file('avatar');
+            $file_path = Student::resizeAvatar($original_image, $newStudent->id);
+            $newStudent->avatar = $file_path;
+            $newStudent->save();
+        }
         return redirect()->route('students.index');
     }
 
@@ -114,9 +129,18 @@ class StudentController extends Controller
      */
     public function update(UpdateRequest $request, $id)
     {
+        $id = $this->model::decode($id);
         $createData = $request->validated();
-        $student = $this->model::findOrFail($this->model::decode($id));
+        $student = $this->model::findOrFail($id);
+
         $student->update($createData);
+        if ($request->hasFile('avatar')) {
+            $original_image = $request->file('avatar');
+            $file_path = Student::resizeAvatar($original_image, $id);
+            $student->avatar = $file_path;
+            $student->save();
+        }
+
         return redirect()->route('students.index');
     }
 
@@ -145,15 +169,39 @@ class StudentController extends Controller
 
     public function api()
     {
-        return DataTables::of($this->model::query())
-            ->editColumn('created_at', function ($object) {
-                return $object->created_format;
+        $query = $this->model->select('students.*')
+            ->addSelect('courses.name as course_name')
+            ->join('courses', 'courses.id', 'students.course_id');
+        //hieu xuat kem
+
+        // $query = DB::table('students')
+        //     ->leftJoin('courses', 'courses.id', '=', 'students.course_id')
+        //     ->get();
+        //khuyet diem la se khong nhan duoc get attribute: ex: full_name
+
+        // $query = $this->model->loadMissing('course');
+
+        return DataTables::of($query)
+            ->addColumn('course_name', function ($object) {
+                if ($object->course_name) {
+                    return $object->course_name;
+                }
+                return "khong co";
+            })
+            ->editColumn('status', function ($object) {
+                return $object->status;
             })
             ->addColumn('full_name', function ($object) {
                 return $object->full_name;
             })
             ->editColumn('year', function ($object) {
                 return $object->age;
+            })
+            ->editColumn('avatar', function ($object) {
+                if (filter_var($object->avatar, FILTER_VALIDATE_URL)) {
+                    return $object->avatar;
+                }
+                return asset($this->dirImages . $object->avatar);
             })
             ->addColumn('edit', function ($object) {
                 $link = route('students.edit', ['student' => $object]);
@@ -162,6 +210,18 @@ class StudentController extends Controller
             ->addColumn('delete', function ($object) {
                 $link = route('students.destroy', ['student' => $object]);
                 return $link;
+            })
+            ->filterColumn('course_name', function ($query, $keyword) {
+                if ($keyword != 'null') {
+                    $query->whereHas('course', function ($q) use ($keyword) {
+                        return $q->where('id', $keyword);
+                    });
+                }
+            })
+            ->filterColumn('status', function ($query, $keyword) {
+                if ($keyword !== '0') {
+                    $query->where('status', $keyword);
+                }
             })
             ->make(true);
     }

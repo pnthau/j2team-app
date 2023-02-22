@@ -58,6 +58,10 @@ class UpdateRequest extends FormRequest
                 "bail",
                 "required",
                 "integer"
+            ],
+            "avatar" => [
+                "file",
+                "image",
             ]
         ];
     }

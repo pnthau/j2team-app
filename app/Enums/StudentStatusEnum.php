@@ -25,4 +25,14 @@ final class StudentStatusEnum extends Enum
             "Tạm hoảng" => self::TAM_HOANG
         ];
     }
+
+    public static function getNameStatus($value)
+    {
+        return array_search($value, self::getStudentStatus());
+    }
+
+    public static function getValueByKey($key)
+    {
+        return self::getStudentStatus()[$key];
+    }
 }

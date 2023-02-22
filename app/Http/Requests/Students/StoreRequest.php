@@ -56,6 +56,10 @@ class StoreRequest extends FormRequest
                 "bail",
                 "required",
                 "integer"
+            ],
+            "avatar" => [
+                "file",
+                "image",
             ]
         ];
     }
